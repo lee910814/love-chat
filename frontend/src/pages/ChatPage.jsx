@@ -8,6 +8,8 @@ import { useAuth } from "../contexts/AuthContext";
 import MessageBubble from "../components/MessageBubble";
 import { theme } from "../theme";
 
+const API_BASE = import.meta.env.VITE_API_URL || "";
+
 // ─────────────────────────── 스타일 ───────────────────────────
 
 const Layout = styled.div`
@@ -458,7 +460,7 @@ export default function ChatPage() {
           const headers = {};
           if (token) headers.Authorization = `Bearer ${token}`;
 
-          const res = await fetch("/chat/transcribe", { method: "POST", headers, body: formData });
+          const res = await fetch(`${API_BASE}/chat/transcribe`, { method: "POST", headers, body: formData });
           if (!res.ok) throw new Error("변환 실패");
           const { text } = await res.json();
           if (text.trim()) {

@@ -1,7 +1,9 @@
 import axios from "axios";
 
+const BASE_URL = import.meta.env.VITE_API_URL || "";
+
 const api = axios.create({
-  baseURL: "/",
+  baseURL: BASE_URL,
   headers: { "Content-Type": "application/json" },
 });
 
@@ -59,7 +61,7 @@ export async function streamChat(message, token, onDelta, onDone, onError, categ
     const headers = { "Content-Type": "application/json" };
     if (token) headers.Authorization = `Bearer ${token}`;
 
-    const response = await fetch("/chat/stream", {
+    const response = await fetch(`${BASE_URL}/chat/stream`, {
       method: "POST",
       headers,
       body: JSON.stringify({ message, category, history }),
