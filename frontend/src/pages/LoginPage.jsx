@@ -183,7 +183,8 @@ export default function LoginPage() {
     setError("");
     try {
       const { data } = await authAPI.login(form);
-      login(data.access_token, { username: data.username });
+      const payload = JSON.parse(atob(data.access_token.split(".")[1]));
+      login(data.access_token, { username: data.username, is_admin: payload.is_admin ?? false });
       navigate("/chat");
     } catch (err) {
       setError(err.response?.data?.detail || "로그인에 실패했습니다");

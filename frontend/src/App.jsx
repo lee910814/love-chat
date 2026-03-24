@@ -6,6 +6,7 @@ import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import ChatPage from "./pages/ChatPage";
 import MyPage from "./pages/MyPage";
+import AdminPage from "./pages/AdminPage";
 import { theme } from "./theme";
 
 const globalStyles = css`
@@ -39,6 +40,7 @@ function AppRoutes() {
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/chat" element={<ChatPage />} />
       <Route path="/mypage" element={<MyPage />} />
+      <Route path="/admin" element={<AdminPage />} />
     </Routes>
   );
 }

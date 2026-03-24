@@ -40,6 +40,12 @@ export const chatAPI = {
   clearHistory: () => api.delete("/chat/history"),
 };
 
+export const adminAPI = {
+  summary: () => api.get("/admin/emotion-scores/summary"),
+  scores: () => api.get("/admin/emotion-scores"),
+  userScores: (userId) => api.get(`/admin/emotion-scores/user/${userId}`),
+};
+
 /**
  * SSE 스트리밍 채팅
  * @param {string} message

@@ -24,6 +24,19 @@ class Conversation(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
 
+class EmotionScore(Base):
+    __tablename__ = "emotion_scores"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    score = Column(Integer, nullable=False)          # 1~10 (낮을수록 부정적)
+    emotion_label = Column(String(20), nullable=False)
+    emotion_emoji = Column(String(10), nullable=False)
+    message_snippet = Column(String(100), nullable=False)  # 메시지 앞 100자
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    expires_at = Column(DateTime(timezone=True), nullable=False)  # 자동 만료 시각
+
+
 class DailyUsage(Base):
     __tablename__ = "daily_usage"
 

@@ -478,6 +478,35 @@ export default function ChatPage() {
     }
   }, [recording, token, sendMessage]);
 
+  // 스페이스바 PTT (Push-to-Talk)
+  useEffect(() => {
+    const onKeyDown = (e) => {
+      if (e.code !== "Space") return;
+      if (e.repeat) return;
+      // textarea에 포커스가 있으면 일반 타이핑으로 처리
+      if (document.activeElement === textareaRef.current) return;
+      e.preventDefault();
+      if (!recording && !streaming && !transcribing) {
+        handleMic();
+      }
+    };
+
+    const onKeyUp = (e) => {
+      if (e.code !== "Space") return;
+      if (document.activeElement === textareaRef.current) return;
+      if (recording) {
+        mediaRecorderRef.current?.stop();
+      }
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    window.addEventListener("keyup", onKeyUp);
+    return () => {
+      window.removeEventListener("keydown", onKeyDown);
+      window.removeEventListener("keyup", onKeyUp);
+    };
+  }, [recording, streaming, transcribing, handleMic]);
+
   const handleClearHistory = async () => {
     if (!window.confirm("대화 기록을 모두 삭제할까요?")) return;
     await chatAPI.clearHistory();
@@ -536,20 +565,6 @@ export default function ChatPage() {
         </HeaderRight>
       </Header>
 
-      {messages.length === 0 && (
-        <CategoryBar>
-          {CATEGORIES.map((cat) => (
-            <CategoryChip
-              key={cat.label}
-              active={selectedCategory === cat.value}
-              onClick={() => setSelectedCategory(cat.value)}
-            >
-              {cat.label}
-            </CategoryChip>
-          ))}
-        </CategoryBar>
-      )}
-
       <MessageArea>
         {historyLoading ? (
           <WelcomeBox>
@@ -558,7 +573,6 @@ export default function ChatPage() {
           </WelcomeBox>
         ) : messages.length === 0 ? (
           <WelcomeBox>
-            <WelcomeEmoji>🌸</WelcomeEmoji>
             <WelcomeTitle>연애 고민이 있으신가요?</WelcomeTitle>
             <SuggestGrid>
               {SUGGESTIONS.map((s) => (
@@ -581,7 +595,7 @@ export default function ChatPage() {
             value={input}
             onChange={handleInput}
             onKeyDown={handleKeyDown}
-            placeholder={transcribing ? "음성 변환 중..." : "연애 고민을 입력하세요... (Enter로 전송, Shift+Enter 줄바꿈)"}
+            placeholder={transcribing ? "음성 변환 중..." : recording ? "말씀하세요... (스페이스바를 떼면 전송)" : "연애 고민을 입력하세요... (Enter 전송 / 스페이스바 음성입력)"}
             disabled={streaming || transcribing}
             rows={1}
             over={input.length > MESSAGE_MAX}
@@ -591,7 +605,7 @@ export default function ChatPage() {
             recording={recording}
             disabled={streaming || transcribing}
             onClick={handleMic}
-            title={recording ? "녹음 중지" : "음성 입력"}
+            title={recording ? "스페이스바를 떼면 전송" : "스페이스바를 누르고 있으면 녹음"}
           >
             {transcribing ? "⏳" : recording ? "⏹" : "🎤"}
           </MicBtn>

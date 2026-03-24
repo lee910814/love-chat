@@ -85,23 +85,26 @@ async def _rewrite_query(message: str) -> str:
 
 
 EMOTIONS = [
-    {"label": "슬픔",   "emoji": "😢"},
-    {"label": "불안",   "emoji": "😰"},
-    {"label": "분노",   "emoji": "😤"},
-    {"label": "상처",   "emoji": "💔"},
-    {"label": "혼란",   "emoji": "😵"},
-    {"label": "그리움", "emoji": "🥺"},
-    {"label": "외로움", "emoji": "🌧️"},
-    {"label": "설렘",   "emoji": "💓"},
-    {"label": "희망",   "emoji": "🌱"},
-    {"label": "속상함", "emoji": "😞"},
+    {"label": "슬픔",   "emoji": "😢", "score": 2},
+    {"label": "불안",   "emoji": "😰", "score": 3},
+    {"label": "분노",   "emoji": "😤", "score": 4},
+    {"label": "상처",   "emoji": "💔", "score": 2},
+    {"label": "혼란",   "emoji": "😵", "score": 4},
+    {"label": "그리움", "emoji": "🥺", "score": 4},
+    {"label": "외로움", "emoji": "🌧️", "score": 2},
+    {"label": "설렘",   "emoji": "💓", "score": 8},
+    {"label": "희망",   "emoji": "🌱", "score": 9},
+    {"label": "속상함", "emoji": "😞", "score": 3},
 ]
+
+# 감정 레이블 → 점수 빠른 조회
+EMOTION_SCORE_MAP = {e["label"]: e["score"] for e in EMOTIONS}
 
 _EMOTION_LIST = ", ".join(f"{e['label']}({e['emoji']})" for e in EMOTIONS)
 
 
 async def analyze_emotion(message: str) -> dict:
-    """사용자 메시지의 주된 감정 하나를 분석"""
+    """사용자 메시지의 주된 감정 하나를 분석. score(1~10) 포함 반환."""
     import json as _json
     response = await _openai.chat.completions.create(
         model=CHAT_MODEL,
@@ -120,7 +123,9 @@ async def analyze_emotion(message: str) -> dict:
         max_tokens=30,
         response_format={"type": "json_object"},
     )
-    return _json.loads(response.choices[0].message.content)
+    result = _json.loads(response.choices[0].message.content)
+    result["score"] = EMOTION_SCORE_MAP.get(result.get("label", ""), 5)
+    return result
 
 
 async def stream_rag_response(user_message: str, category: str | None = None, history: list = [], mbti: str | None = None):

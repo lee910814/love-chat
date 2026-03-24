@@ -1,3 +1,4 @@
+import os
 from datetime import datetime, timedelta
 from collections import defaultdict
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -10,6 +11,17 @@ from models import User
 from auth import verify_password, get_password_hash, create_access_token, get_current_user
 
 router = APIRouter(prefix="/auth", tags=["auth"])
+
+# 환경변수로 관리자 이메일 목록 지정 (쉼표 구분)
+_ADMIN_EMAILS = {
+    e.strip().lower()
+    for e in os.getenv("ADMIN_EMAILS", "").split(",")
+    if e.strip()
+}
+
+
+def _is_admin(email: str) -> bool:
+    return email.lower() in _ADMIN_EMAILS
 
 # 로그인 실패 추적 (이메일 기준)
 MAX_ATTEMPTS = 5
@@ -112,7 +124,7 @@ async def register(req: RegisterRequest, db: AsyncSession = Depends(get_db)):
     await db.commit()
     await db.refresh(user)
 
-    token = create_access_token({"sub": str(user.id), "username": user.username, "mbti": user.mbti})
+    token = create_access_token({"sub": str(user.id), "username": user.username, "mbti": user.mbti, "is_admin": _is_admin(str(req.email))})
     return TokenResponse(access_token=token, token_type="bearer", username=user.username)
 
 
@@ -137,7 +149,7 @@ async def login(req: LoginRequest, db: AsyncSession = Depends(get_db)):
 
     # 로그인 성공 시 실패 기록 초기화
     _clear_failures(email)
-    token = create_access_token({"sub": str(user.id), "username": user.username, "mbti": user.mbti})
+    token = create_access_token({"sub": str(user.id), "username": user.username, "mbti": user.mbti, "is_admin": _is_admin(email)})
     return TokenResponse(access_token=token, token_type="bearer", username=user.username)
 
 

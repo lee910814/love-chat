@@ -15,6 +15,7 @@ from database import init_db
 from limiter import limiter
 from routes.auth_routes import router as auth_router
 from routes.chat_routes import router as chat_router
+from routes.admin_routes import router as admin_router
 
 
 @asynccontextmanager
@@ -37,6 +38,7 @@ app.add_middleware(
 
 app.include_router(auth_router)
 app.include_router(chat_router)
+app.include_router(admin_router)
 
 
 @app.get("/health")
