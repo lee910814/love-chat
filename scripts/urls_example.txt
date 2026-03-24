@@ -1,0 +1,5 @@
+# 연애 상담 YouTube 영상 목록
+# 형식: YouTube URL|채널명
+# 예시:
+# https://youtu.be/EXAMPLE1|연애의참견
+# https://youtu.be/EXAMPLE2|오은영박사

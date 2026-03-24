@@ -1,0 +1,20 @@
+# 절대 Git에 올리면 안 되는 파일들
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+env/
+
+# Node.js
+node_modules/
+dist/
+build/
+
+# 임시 파일
+*.wav
+*.mp3
+*.tmp

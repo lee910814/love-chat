@@ -1,0 +1,5 @@
+yt-dlp>=2024.9.27
+openai-whisper>=20240930
+openai>=1.51.0
+qdrant-client>=1.11.3
+python-dotenv>=1.0.1
